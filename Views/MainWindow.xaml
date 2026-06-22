@@ -1,0 +1,178 @@
+<Window x:Class="StickyNotes.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sticky Note"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanResizeWithGrip"
+        ShowInTaskbar="False"
+        MinWidth="200" MinHeight="180"
+        Width="280"   Height="320"
+        Topmost="False"
+        SizeToContent="Manual">
+
+    <!-- ══════════════════════════════════════════════════════════════
+         Root border — gives the note its rounded shape and drop-shadow
+    ═══════════════════════════════════════════════════════════════════ -->
+    <Border x:Name="RootBorder"
+            CornerRadius="10"
+            BorderThickness="1"
+            BorderBrush="#20000000">
+
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="18"
+                              ShadowDepth="4"
+                              Direction="270"
+                              Color="#000000"
+                              Opacity="0.18" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <!-- Header -->
+                <RowDefinition Height="36" />
+                <!-- Body (text area grows to fill) -->
+                <RowDefinition Height="*" />
+                <!-- Topic bar -->
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- ══════════════════════════════════════════════════════
+                 ROW 0 — Draggable header
+            ═══════════════════════════════════════════════════════════ -->
+            <Border x:Name="HeaderBorder"
+                    Grid.Row="0"
+                    CornerRadius="10,10,0,0"
+                    MouseLeftButtonDown="Header_MouseLeftButtonDown"
+                    Cursor="SizeAll">
+
+                <Grid Margin="6,0,4,0">
+                    <Grid.ColumnDefinitions>
+                        <!-- Buttons on the left -->
+                        <ColumnDefinition Width="Auto" />
+                        <!-- Drag handle (transparent, grabs mouse) -->
+                        <ColumnDefinition Width="*" />
+                        <!-- Delete button on the right -->
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left button group -->
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+
+                        <!-- New Note (+) -->
+                        <Button x:Name="BtnNewNote"
+                                Style="{StaticResource HeaderButtonStyle}"
+                                ToolTip="New Note"
+                                Click="BtnNewNote_Click"
+                                AutomationProperties.Name="New Note">
+                            <TextBlock Text="+" FontSize="17" FontWeight="Light" Margin="0,-1,0,0"/>
+                        </Button>
+
+                        <!-- Colour Palette -->
+                        <Button x:Name="BtnColorPicker"
+                                Style="{StaticResource HeaderButtonStyle}"
+                                ToolTip="Change Color"
+                                Click="BtnColorPicker_Click"
+                                AutomationProperties.Name="Change Color">
+                            <!-- Palette icon drawn with three overlapping ellipses -->
+                            <Canvas Width="16" Height="16">
+                                <Ellipse Canvas.Left="0" Canvas.Top="2"
+                                         Width="10" Height="10"
+                                         Fill="#FEF3C7" Stroke="#9CA3AF" StrokeThickness="1"/>
+                                <Ellipse Canvas.Left="6" Canvas.Top="5"
+                                         Width="10" Height="10"
+                                         Fill="#DBEAFE" Stroke="#9CA3AF" StrokeThickness="1"/>
+                                <Ellipse Canvas.Left="3" Canvas.Top="6"
+                                         Width="10" Height="10"
+                                         Fill="#DCFCE7" Stroke="#9CA3AF" StrokeThickness="1"/>
+                            </Canvas>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Centre drag zone -->
+                    <Border Grid.Column="1"
+                            Background="Transparent"
+                            MouseLeftButtonDown="Header_MouseLeftButtonDown"
+                            Cursor="SizeAll" />
+
+                    <!-- Delete (X) -->
+                    <Button x:Name="BtnDelete"
+                            Grid.Column="2"
+                            Style="{StaticResource HeaderButtonStyle}"
+                            ToolTip="Delete Note"
+                            Click="BtnDelete_Click"
+                            AutomationProperties.Name="Delete Note"
+                            Foreground="#EF4444">
+                        <TextBlock Text="✕" FontSize="12" />
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- ══════════════════════════════════════════════════════
+                 ROW 1 — Note body (TextBox)
+            ═══════════════════════════════════════════════════════════ -->
+            <TextBox x:Name="NoteTextBox"
+                     Grid.Row="1"
+                     Style="{StaticResource NoteTextBoxStyle}"
+                     TextChanged="NoteTextBox_TextChanged"
+                     SpellCheck.IsEnabled="True"
+                     Language="en-US">
+                <TextBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Cut"   Command="ApplicationCommands.Cut"   />
+                        <MenuItem Header="Copy"  Command="ApplicationCommands.Copy"  />
+                        <MenuItem Header="Paste" Command="ApplicationCommands.Paste" />
+                        <Separator />
+                        <!-- "Change Color" sub-menu items are injected in code-behind -->
+                        <MenuItem x:Name="ContextColorMenu" Header="Change Color" />
+                    </ContextMenu>
+                </TextBox.ContextMenu>
+            </TextBox>
+
+            <!-- ══════════════════════════════════════════════════════
+                 ROW 2 — Topic bar  (label / edit overlay)
+            ═══════════════════════════════════════════════════════════ -->
+
+            <!-- Read-only label (double-click to edit) -->
+            <Border x:Name="TopicBorder"
+                    Grid.Row="2"
+                    CornerRadius="0,0,10,10"
+                    Padding="10,5">
+                <TextBlock x:Name="TopicLabel"
+                           FontFamily="Segoe UI"
+                           FontSize="11"
+                           FontStyle="Italic"
+                           Foreground="#6B7280"
+                           Text="Double-click to set topic…"
+                           Cursor="IBeam"
+                           MouseLeftButtonDown="TopicLabel_MouseLeftButtonDown"
+                           ToolTip="Double-click to edit topic" />
+            </Border>
+
+            <!-- Editable TextBox (shown only while editing; overlays TopicBorder) -->
+            <Border x:Name="TopicEditorBorder"
+                    Grid.Row="2"
+                    CornerRadius="0,0,10,10"
+                    Padding="8,4"
+                    Background="Transparent"
+                    Visibility="Collapsed">
+                <TextBox x:Name="TopicTextBox"
+                         FontFamily="Segoe UI"
+                         FontSize="11"
+                         FontStyle="Italic"
+                         Foreground="#374151"
+                         Background="Transparent"
+                         BorderThickness="0,0,0,1"
+                         BorderBrush="#9CA3AF"
+                         MaxLength="60"
+                         FocusVisualStyle="{x:Null}"
+                         LostFocus="TopicTextBox_LostFocus"
+                         KeyDown="TopicTextBox_KeyDown" />
+            </Border>
+
+        </Grid>
+    </Border>
+</Window>

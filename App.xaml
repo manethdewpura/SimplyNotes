@@ -1,0 +1,140 @@
+<Application x:Class="StickyNotes.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnExplicitShutdown">
+
+    <Application.Resources>
+
+        <!-- ══════════════════════════════════════════════════════════
+             Global font
+        ════════════════════════════════════════════════════════════ -->
+        <FontFamily x:Key="PrimaryFont">Segoe UI</FontFamily>
+
+        <!-- ══════════════════════════════════════════════════════════
+             Note text area
+        ════════════════════════════════════════════════════════════ -->
+        <Style x:Key="NoteTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontFamily"                      Value="{StaticResource PrimaryFont}" />
+            <Setter Property="FontSize"                        Value="13.5" />
+            <Setter Property="Foreground"                      Value="#374151" />
+            <Setter Property="Background"                      Value="Transparent" />
+            <Setter Property="BorderThickness"                 Value="0" />
+            <Setter Property="Padding"                         Value="10,8" />
+            <Setter Property="AcceptsReturn"                   Value="True" />
+            <Setter Property="AcceptsTab"                      Value="True" />
+            <Setter Property="TextWrapping"                    Value="Wrap" />
+            <Setter Property="VerticalScrollBarVisibility"     Value="Auto" />
+            <Setter Property="VerticalAlignment"               Value="Stretch" />
+            <Setter Property="HorizontalAlignment"             Value="Stretch" />
+            <Setter Property="CaretBrush"                      Value="#374151" />
+            <Setter Property="SelectionBrush"                  Value="#60374151" />
+            <Setter Property="FocusVisualStyle"                Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          Focusable="False"
+                                          VerticalScrollBarVisibility="Auto" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ══════════════════════════════════════════════════════════
+             Header buttons (New / Color / Delete)
+        ════════════════════════════════════════════════════════════ -->
+        <Style x:Key="HeaderButtonStyle" TargetType="Button">
+            <Setter Property="FontFamily"       Value="{StaticResource PrimaryFont}" />
+            <Setter Property="FontSize"         Value="14" />
+            <Setter Property="Foreground"       Value="#374151" />
+            <Setter Property="Background"       Value="Transparent" />
+            <Setter Property="BorderThickness"  Value="0" />
+            <Setter Property="Cursor"           Value="Hand" />
+            <Setter Property="Width"            Value="28" />
+            <Setter Property="Height"           Value="28" />
+            <Setter Property="Margin"           Value="1,0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#20000000" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#35000000" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ══════════════════════════════════════════════════════════
+             Colour-swatch buttons (inside the floating colour picker)
+        ════════════════════════════════════════════════════════════ -->
+        <Style x:Key="SwatchButtonStyle" TargetType="Button">
+            <Setter Property="Width"            Value="26" />
+            <Setter Property="Height"           Value="26" />
+            <Setter Property="Margin"           Value="3" />
+            <Setter Property="BorderThickness"  Value="2" />
+            <Setter Property="BorderBrush"      Value="Transparent" />
+            <Setter Property="Cursor"           Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="13" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#80374151" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#374151" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ══════════════════════════════════════════════════════════
+             Context menu & menu items
+        ════════════════════════════════════════════════════════════ -->
+        <Style TargetType="ContextMenu">
+            <Setter Property="FontFamily"      Value="{StaticResource PrimaryFont}" />
+            <Setter Property="FontSize"        Value="13" />
+            <Setter Property="Background"      Value="#FFFDF6" />
+            <Setter Property="BorderBrush"     Value="#D1D5DB" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding"         Value="0,4" />
+        </Style>
+
+        <Style TargetType="MenuItem">
+            <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}" />
+            <Setter Property="FontSize"   Value="13" />
+            <Setter Property="Foreground" Value="#374151" />
+            <Setter Property="Padding"    Value="12,5" />
+            <Setter Property="Height"     Value="30" />
+        </Style>
+
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="8,2" />
+        </Style>
+
+    </Application.Resources>
+</Application>
