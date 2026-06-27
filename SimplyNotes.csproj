@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <AssemblyName>StickyNotes</AssemblyName>
-    <RootNamespace>StickyNotes</RootNamespace>
+    <AssemblyName>SimplyNotes</AssemblyName>
+    <RootNamespace>SimplyNotes</RootNamespace>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
     <ApplicationIcon>icon.ico</ApplicationIcon>

@@ -4,7 +4,7 @@
 // ============================================================
 using System.Windows.Media;
 
-namespace StickyNotes.Services
+namespace SimplyNotes.Services
 {
     /// <summary>
     /// Provides the five built-in pastel colour themes and derived accent colours

@@ -14,13 +14,13 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using StickyNotes.Models;
-using StickyNotes.Services;
+using SimplyNotes.Models;
+using SimplyNotes.Services;
 
-namespace StickyNotes.Views
+namespace SimplyNotes.Views
 {
     /// <summary>
-    /// Code-behind for a single sticky-note window.
+    /// Code-behind for a single Simply-note window.
     ///
     /// Design decisions:
     ///   • The window owns a <see cref="NoteData"/> object and mutates it in-place;

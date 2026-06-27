@@ -1,6 +1,6 @@
 # SimplyNotes
 
-A lightweight, Windows-native desktop sticky notes application built with C# and WPF (.NET 8.0).
+A lightweight, Windows-native desktop Simply notes application built with C# and WPF (.NET 8.0).
 
 ## Features
 
@@ -14,7 +14,7 @@ A lightweight, Windows-native desktop sticky notes application built with C# and
 ## Data Storage
 
 Your notes are saved locally in a single JSON file:
-`%APPDATA%\StickyNotes\notes.json`
+`%APPDATA%\SimplyNotes\notes.json`
 
 ## Requirements
 
@@ -24,21 +24,24 @@ Your notes are saved locally in a single JSON file:
 ## Building & Running
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/manethdewpura/SimplyNotes.git
    cd SimplyNotes
    ```
 
 2. Build and run via the .NET CLI:
+
    ```bash
-   dotnet run --project StickyNotes.csproj
+   dotnet run --project SimplyNotes.csproj
    ```
 
-   *Alternatively, open `StickyNotes.slnx` in Visual Studio or JetBrains Rider and hit Run.*
+   _Alternatively, open `SimplyNotes.slnx` in Visual Studio or JetBrains Rider and hit Run._
 
 ## Architecture
 
 The project is structured into three main layers:
+
 - **`Models/`**: Contains the immutable-friendly `NoteData` representing the persisted state of a note.
 - **`Services/`**: Contains the thread-safe JSON persistence layer (`NoteStore`) and the color theming engine (`NoteTheme`).
 - **`Views/`**: Contains the XAML definitions and code-behind for the UI (`MainWindow`).

@@ -1,15 +1,15 @@
 // ============================================================
 //  Models/NoteData.cs
-//  Immutable-friendly data model for a single sticky note.
+//  Immutable-friendly data model for a single Simply note.
 // ============================================================
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace StickyNotes.Models
+namespace SimplyNotes.Models
 {
     /// <summary>
-    /// Represents the persisted data for a single sticky note.
+    /// Represents the persisted data for a single Simply note.
     /// All members are get/set so System.Text.Json can deserialize them.
     /// </summary>
     public sealed class NoteData
@@ -53,7 +53,7 @@ namespace StickyNotes.Models
     }
 
     /// <summary>
-    /// Represents a single item in a sticky note checklist.
+    /// Represents a single item in a Simply note checklist.
     /// </summary>
     public class TodoItem : INotifyPropertyChanged
     {

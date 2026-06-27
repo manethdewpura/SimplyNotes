@@ -5,13 +5,13 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using StickyNotes.Models;
+using SimplyNotes.Models;
 
-namespace StickyNotes.Services
+namespace SimplyNotes.Services
 {
     /// <summary>
     /// Manages reading and writing the <c>notes.json</c> file that stores all
-    /// sticky-note data.  All I/O is marshalled through a <see cref="SemaphoreSlim"/>
+    /// Simply-note data.  All I/O is marshalled through a <see cref="SemaphoreSlim"/>
     /// so concurrent debounced saves never corrupt the file.
     /// </summary>
     public sealed class NoteStore : IDisposable
@@ -25,7 +25,7 @@ namespace StickyNotes.Services
 
         private static readonly string StorePath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "StickyNotes",
+            "SimplyNotes",
             "notes.json");
 
         private static readonly JsonSerializerOptions JsonOptions = new()

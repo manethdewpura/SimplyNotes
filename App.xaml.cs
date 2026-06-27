@@ -2,11 +2,11 @@
 //  App.xaml.cs — Application entry-point
 // ============================================================
 using System.Windows;
-using StickyNotes.Models;
-using StickyNotes.Services;
-using StickyNotes.Views;
+using SimplyNotes.Models;
+using SimplyNotes.Services;
+using SimplyNotes.Views;
 
-namespace StickyNotes
+namespace SimplyNotes
 {
     /// <summary>
     /// Application bootstrap.
@@ -109,7 +109,7 @@ namespace StickyNotes
 
         private static NoteData CreateWelcomeNote() => new()
         {
-            Content = "Welcome to Sticky Notes! ✏️\n\nDouble-click the topic bar below to set a category.",
+            Content = "Welcome to Simply Notes! ✏️\n\nDouble-click the topic bar below to set a category.",
             Topic   = "Welcome",
             Color   = NoteTheme.DefaultColor,
         };
