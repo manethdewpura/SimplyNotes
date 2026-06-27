@@ -1,9 +1,13 @@
 // ============================================================
 //  Views/MainWindow.xaml.cs — Per-note window logic
 // ============================================================
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -35,6 +39,8 @@ namespace StickyNotes.Views
         private readonly NoteData _note;
         private readonly DispatcherTimer _debounce;
         private Popup? _colorPopup;             // lazy-created on first click
+
+        public ObservableCollection<TodoItem> Todos { get; } = new();
 
         // Prevent saves while we are loading initial data into controls
         private bool _isInitialising = true;
@@ -76,6 +82,12 @@ namespace StickyNotes.Views
             Width  = _note.Width;
             Height = _note.Height;
 
+            BtnPin.IsChecked = _note.IsTopmost;
+            Topmost = _note.IsTopmost;
+            
+            ChecklistItemsControl.ItemsSource = Todos;
+            BtnChecklist.IsChecked = _note.IsChecklistMode;
+
             _isInitialising = false;
         }
 
@@ -84,11 +96,38 @@ namespace StickyNotes.Views
         /// <summary>Populates the UI controls from the bound <see cref="NoteData"/>.</summary>
         private void LoadContent()
         {
-            NoteTextBox.Text       = _note.Content;
-            NoteTextBox.CaretIndex = NoteTextBox.Text.Length;  // cursor at end
+            if (!string.IsNullOrEmpty(_note.Content))
+            {
+                if (_note.Content.StartsWith(@"{\rtf1"))
+                {
+                    using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(_note.Content));
+                    var textRange = new TextRange(NoteRichTextBox.Document.ContentStart, NoteRichTextBox.Document.ContentEnd);
+                    textRange.Load(stream, DataFormats.Rtf);
+                }
+                else
+                {
+                    var textRange = new TextRange(NoteRichTextBox.Document.ContentStart, NoteRichTextBox.Document.ContentEnd);
+                    textRange.Text = _note.Content;
+                }
+            }
+            
+            NoteRichTextBox.CaretPosition = NoteRichTextBox.Document.ContentEnd;
 
             if (!string.IsNullOrWhiteSpace(_note.Topic))
                 TopicLabel.Text = _note.Topic;
+
+            foreach (var item in _note.Checklist)
+            {
+                var todo = new TodoItem { Id = item.Id, IsCompleted = item.IsCompleted, Text = item.Text };
+                todo.PropertyChanged += (s, e) => SyncChecklist();
+                Todos.Add(todo);
+            }
+
+            if (_note.IsChecklistMode)
+            {
+                NoteRichTextBox.Visibility = Visibility.Collapsed;
+                ChecklistScrollViewer.Visibility = Visibility.Visible;
+            }
         }
 
         /// <summary>
@@ -305,6 +344,113 @@ namespace StickyNotes.Views
                 DragMove();
         }
 
+        private void BtnPin_Checked(object sender, RoutedEventArgs e)
+        {
+            Topmost = true;
+            _note.IsTopmost = true;
+            ScheduleSave();
+        }
+
+        private void BtnPin_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Topmost = false;
+            _note.IsTopmost = false;
+            ScheduleSave();
+        }
+
+        // ── Checklist mode ───────────────────────────────────────────────
+
+        private void BtnChecklist_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_isInitialising) return;
+            _note.IsChecklistMode = true;
+            
+            NoteRichTextBox.Visibility = Visibility.Collapsed;
+            ChecklistScrollViewer.Visibility = Visibility.Visible;
+
+            if (Todos.Count == 0)
+            {
+                var textRange = new TextRange(NoteRichTextBox.Document.ContentStart, NoteRichTextBox.Document.ContentEnd);
+                var lines = textRange.Text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var line in lines)
+                {
+                    var todo = new TodoItem { Text = line.Trim() };
+                    todo.PropertyChanged += (s, ev) => SyncChecklist();
+                    Todos.Add(todo);
+                }
+                SyncChecklist();
+            }
+
+            ScheduleSave();
+        }
+
+        private void BtnChecklist_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (_isInitialising) return;
+            _note.IsChecklistMode = false;
+            
+            ChecklistScrollViewer.Visibility = Visibility.Collapsed;
+            NoteRichTextBox.Visibility = Visibility.Visible;
+
+            ScheduleSave();
+        }
+
+        private void TodoCheckBox_Checked(object sender, RoutedEventArgs e) => SyncChecklist();
+        private void TodoTextBox_TextChanged(object sender, TextChangedEventArgs e) => SyncChecklist();
+
+        private void BtnAddTodo_Click(object sender, RoutedEventArgs e)
+        {
+            var todo = new TodoItem();
+            todo.PropertyChanged += (s, ev) => SyncChecklist();
+            Todos.Add(todo);
+            SyncChecklist();
+        }
+
+        private void BtnDeleteTodo_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is TodoItem item)
+            {
+                Todos.Remove(item);
+                SyncChecklist();
+            }
+        }
+
+        private void SyncChecklist()
+        {
+            if (_isInitialising) return;
+            _note.Checklist = Todos.Select(t => new TodoItem { Id = t.Id, IsCompleted = t.IsCompleted, Text = t.Text }).ToList();
+            ScheduleSave();
+        }
+
+        private void BtnStrikethrough_Click(object sender, RoutedEventArgs e)
+        {
+            var selection = NoteRichTextBox.Selection;
+            if (selection.IsEmpty) return;
+
+            var currentDecorations = selection.GetPropertyValue(Inline.TextDecorationsProperty) as TextDecorationCollection;
+            var newDecorations = new TextDecorationCollection();
+            
+            if (currentDecorations != null)
+                newDecorations.Add(currentDecorations);
+
+            var hasStrikethrough = false;
+            foreach (var decoration in newDecorations)
+            {
+                if (decoration.Location == TextDecorationLocation.Strikethrough)
+                {
+                    hasStrikethrough = true;
+                    newDecorations.Remove(decoration);
+                    break;
+                }
+            }
+
+            if (!hasStrikethrough)
+                newDecorations.Add(TextDecorations.Strikethrough);
+
+            selection.ApplyPropertyValue(Inline.TextDecorationsProperty, newDecorations);
+            NoteRichTextBox.Focus();
+        }
+
         private void BtnNewNote_Click(object sender, RoutedEventArgs e)
             => ((App)Application.Current).CreateNewNote();
 
@@ -318,9 +464,15 @@ namespace StickyNotes.Views
             Close();
         }
 
-        private void NoteTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void NoteRichTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _note.Content = NoteTextBox.Text;
+            if (_isInitialising) return;
+            
+            var textRange = new TextRange(NoteRichTextBox.Document.ContentStart, NoteRichTextBox.Document.ContentEnd);
+            using var stream = new MemoryStream();
+            textRange.Save(stream, DataFormats.Rtf);
+            _note.Content = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+            
             ScheduleSave();
         }
 

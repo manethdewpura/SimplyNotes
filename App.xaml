@@ -11,9 +11,9 @@
         <FontFamily x:Key="PrimaryFont">Segoe UI</FontFamily>
 
         <!-- ══════════════════════════════════════════════════════════
-             Note text area
+             Note text area (Rich Text)
         ════════════════════════════════════════════════════════════ -->
-        <Style x:Key="NoteTextBoxStyle" TargetType="TextBox">
+        <Style x:Key="NoteRichTextBoxStyle" TargetType="RichTextBox">
             <Setter Property="FontFamily"                      Value="{StaticResource PrimaryFont}" />
             <Setter Property="FontSize"                        Value="13.5" />
             <Setter Property="Foreground"                      Value="#374151" />
@@ -22,7 +22,6 @@
             <Setter Property="Padding"                         Value="10,8" />
             <Setter Property="AcceptsReturn"                   Value="True" />
             <Setter Property="AcceptsTab"                      Value="True" />
-            <Setter Property="TextWrapping"                    Value="Wrap" />
             <Setter Property="VerticalScrollBarVisibility"     Value="Auto" />
             <Setter Property="VerticalAlignment"               Value="Stretch" />
             <Setter Property="HorizontalAlignment"             Value="Stretch" />
@@ -31,7 +30,7 @@
             <Setter Property="FocusVisualStyle"                Value="{x:Null}" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
+                    <ControlTemplate TargetType="RichTextBox">
                         <Border Background="{TemplateBinding Background}"
                                 BorderThickness="{TemplateBinding BorderThickness}">
                             <ScrollViewer x:Name="PART_ContentHost"
@@ -73,6 +72,85 @@
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="#35000000" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ══════════════════════════════════════════════════════════
+             Header toggle buttons (Pin, Spin)
+        ════════════════════════════════════════════════════════════ -->
+        <Style x:Key="HeaderToggleButtonStyle" TargetType="ToggleButton">
+            <Setter Property="FontFamily"       Value="{StaticResource PrimaryFont}" />
+            <Setter Property="FontSize"         Value="14" />
+            <Setter Property="Foreground"       Value="#374151" />
+            <Setter Property="Background"       Value="Transparent" />
+            <Setter Property="BorderThickness"  Value="0" />
+            <Setter Property="Cursor"           Value="Hand" />
+            <Setter Property="Width"            Value="28" />
+            <Setter Property="Height"           Value="28" />
+            <Setter Property="Margin"           Value="1,0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#20000000" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#35000000" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#40000000" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ══════════════════════════════════════════════════════════
+             Format toggle buttons (Bold, Italic, Strikethrough, Lists)
+        ════════════════════════════════════════════════════════════ -->
+        <Style x:Key="FormatToggleButtonStyle" TargetType="ToggleButton">
+            <Setter Property="FontFamily"       Value="{StaticResource PrimaryFont}" />
+            <Setter Property="FontSize"         Value="12" />
+            <Setter Property="FontWeight"       Value="SemiBold" />
+            <Setter Property="Foreground"       Value="#4B5563" />
+            <Setter Property="Background"       Value="Transparent" />
+            <Setter Property="BorderThickness"  Value="0" />
+            <Setter Property="Cursor"           Value="Hand" />
+            <Setter Property="Width"            Value="24" />
+            <Setter Property="Height"           Value="24" />
+            <Setter Property="Margin"           Value="1,0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#1F2937" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Foreground" Value="#000000" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="#111827" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

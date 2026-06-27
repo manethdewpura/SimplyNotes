@@ -2,6 +2,10 @@
 //  Models/NoteData.cs
 //  Immutable-friendly data model for a single sticky note.
 // ============================================================
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
 namespace StickyNotes.Models
 {
     /// <summary>
@@ -35,5 +39,60 @@ namespace StickyNotes.Models
 
         /// <summary>Window height in device-independent pixels.</summary>
         public double Height { get; set; } = 320;
+
+        /// <summary>Whether the note is pinned to remain always on top.</summary>
+        public bool IsTopmost { get; set; } = false;
+
+        // ── Checklist mode ───────────────────────────────────────────────
+
+        /// <summary>Whether the note is displaying interactive checkboxes instead of rich text.</summary>
+        public bool IsChecklistMode { get; set; } = false;
+
+        /// <summary>The items for the checklist.</summary>
+        public List<TodoItem> Checklist { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Represents a single item in a sticky note checklist.
+    /// </summary>
+    public class TodoItem : INotifyPropertyChanged
+    {
+        private bool _isCompleted;
+        private string _text = string.Empty;
+
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        public bool IsCompleted
+        {
+            get => _isCompleted;
+            set
+            {
+                if (_isCompleted != value)
+                {
+                    _isCompleted = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string Text
+        {
+            get => _text;
+            set
+            {
+                if (_text != value)
+                {
+                    _text = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

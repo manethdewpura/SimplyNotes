@@ -21,15 +21,17 @@ namespace StickyNotes.Services
         public static readonly IReadOnlyList<(string Name, string Hex)> Palette =
             new List<(string, string)>
             {
-                ("Yellow", "#FEF3C7"),
-                ("Blue",   "#DBEAFE"),
-                ("Green",  "#DCFCE7"),
-                ("Pink",   "#FCE7F3"),
-                ("Purple", "#EDE9FE"),
+                ("Yellow", "#FDE047"),
+                ("Blue",   "#93C5FD"),
+                ("Green",  "#86EFAC"),
+                ("Pink",   "#F9A8D4"),
+                ("Purple", "#C4B5FD"),
+                ("Red",    "#FCA5A5"),
+                ("Orange", "#FDBA74"),
             };
 
         /// <summary>The hex colour used when creating a brand-new note.</summary>
-        public const string DefaultColor = "#FEF3C7";  // Yellow
+        public const string DefaultColor = "#FDE047";  // Vibrant Yellow
 
         // ── Derived accent helpers ───────────────────────────────────────
 

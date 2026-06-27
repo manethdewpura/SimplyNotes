@@ -71,6 +71,26 @@
                             <TextBlock Text="+" FontSize="17" FontWeight="Light" Margin="0,-1,0,0"/>
                         </Button>
 
+                        <!-- Pin (Always on top) -->
+                        <ToggleButton x:Name="BtnPin"
+                                      Style="{StaticResource HeaderToggleButtonStyle}"
+                                      ToolTip="Pin (Always on Top)"
+                                      Checked="BtnPin_Checked"
+                                      Unchecked="BtnPin_Unchecked"
+                                      AutomationProperties.Name="Pin Note">
+                            <TextBlock Text="📌" FontSize="13" Margin="0,0,0,0"/>
+                        </ToggleButton>
+
+                        <!-- Checklist Mode -->
+                        <ToggleButton x:Name="BtnChecklist"
+                                      Style="{StaticResource HeaderToggleButtonStyle}"
+                                      ToolTip="Toggle Checklist Mode"
+                                      Checked="BtnChecklist_Checked"
+                                      Unchecked="BtnChecklist_Unchecked"
+                                      AutomationProperties.Name="Toggle Checklist">
+                            <TextBlock Text="☑" FontSize="14" Margin="0,0,0,0"/>
+                        </ToggleButton>
+
                         <!-- Colour Palette -->
                         <Button x:Name="BtnColorPicker"
                                 Style="{StaticResource HeaderButtonStyle}"
@@ -81,15 +101,33 @@
                             <Canvas Width="16" Height="16">
                                 <Ellipse Canvas.Left="0" Canvas.Top="2"
                                          Width="10" Height="10"
-                                         Fill="#FEF3C7" Stroke="#9CA3AF" StrokeThickness="1"/>
+                                         Fill="#FDE047" Stroke="#9CA3AF" StrokeThickness="1"/>
                                 <Ellipse Canvas.Left="6" Canvas.Top="5"
                                          Width="10" Height="10"
-                                         Fill="#DBEAFE" Stroke="#9CA3AF" StrokeThickness="1"/>
+                                         Fill="#93C5FD" Stroke="#9CA3AF" StrokeThickness="1"/>
                                 <Ellipse Canvas.Left="3" Canvas.Top="6"
                                          Width="10" Height="10"
-                                         Fill="#DCFCE7" Stroke="#9CA3AF" StrokeThickness="1"/>
+                                         Fill="#86EFAC" Stroke="#9CA3AF" StrokeThickness="1"/>
                             </Canvas>
                         </Button>
+
+                        <!-- Divider -->
+                        <Border Width="1" Height="14" Background="#D1D5DB" Margin="4,0,6,0"/>
+
+                        <!-- Formatting Toolbar -->
+                        <ToggleButton Command="EditingCommands.ToggleBold" CommandTarget="{Binding ElementName=NoteRichTextBox}" ToolTip="Bold" Style="{StaticResource FormatToggleButtonStyle}">
+                            <TextBlock Text="B" />
+                        </ToggleButton>
+                        <ToggleButton Command="EditingCommands.ToggleItalic" CommandTarget="{Binding ElementName=NoteRichTextBox}" ToolTip="Italic" Style="{StaticResource FormatToggleButtonStyle}">
+                            <TextBlock Text="I" FontStyle="Italic"/>
+                        </ToggleButton>
+                        <ToggleButton x:Name="BtnStrikethrough" Click="BtnStrikethrough_Click" ToolTip="Strikethrough" Style="{StaticResource FormatToggleButtonStyle}">
+                            <TextBlock Text="S" TextDecorations="Strikethrough"/>
+                        </ToggleButton>
+                        <ToggleButton Command="EditingCommands.ToggleBullets" CommandTarget="{Binding ElementName=NoteRichTextBox}" ToolTip="Bullet List" Style="{StaticResource FormatToggleButtonStyle}">
+                            <TextBlock Text="•" FontSize="16" Margin="0,-4,0,0"/>
+                        </ToggleButton>
+
                     </StackPanel>
 
                     <!-- Centre drag zone -->
@@ -112,25 +150,101 @@
             </Border>
 
             <!-- ══════════════════════════════════════════════════════
-                 ROW 1 — Note body (TextBox)
+                 ROW 1 — Note body (RichTextBox OR Checklist)
             ═══════════════════════════════════════════════════════════ -->
-            <TextBox x:Name="NoteTextBox"
-                     Grid.Row="1"
-                     Style="{StaticResource NoteTextBoxStyle}"
-                     TextChanged="NoteTextBox_TextChanged"
-                     SpellCheck.IsEnabled="True"
-                     Language="en-US">
-                <TextBox.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Cut"   Command="ApplicationCommands.Cut"   />
-                        <MenuItem Header="Copy"  Command="ApplicationCommands.Copy"  />
-                        <MenuItem Header="Paste" Command="ApplicationCommands.Paste" />
-                        <Separator />
-                        <!-- "Change Color" sub-menu items are injected in code-behind -->
-                        <MenuItem x:Name="ContextColorMenu" Header="Change Color" />
-                    </ContextMenu>
-                </TextBox.ContextMenu>
-            </TextBox>
+            <Grid Grid.Row="1">
+                <!-- Text Mode -->
+                <RichTextBox x:Name="NoteRichTextBox"
+                             Style="{StaticResource NoteRichTextBoxStyle}"
+                             TextChanged="NoteRichTextBox_TextChanged"
+                             SpellCheck.IsEnabled="True"
+                             Language="en-US">
+                    <RichTextBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Cut"   Command="ApplicationCommands.Cut"   />
+                            <MenuItem Header="Copy"  Command="ApplicationCommands.Copy"  />
+                            <MenuItem Header="Paste" Command="ApplicationCommands.Paste" />
+                            <Separator />
+                            <MenuItem x:Name="ContextColorMenu" Header="Change Color" />
+                        </ContextMenu>
+                    </RichTextBox.ContextMenu>
+                </RichTextBox>
+
+                <!-- Checklist Mode -->
+                <ScrollViewer x:Name="ChecklistScrollViewer" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="12,5,12,10">
+                        <ItemsControl x:Name="ChecklistItemsControl">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2,0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <CheckBox Grid.Column="0" 
+                                                  IsChecked="{Binding IsCompleted, Mode=TwoWay}"
+                                                  VerticalAlignment="Center" 
+                                                  Margin="0,0,8,0"
+                                                  Checked="TodoCheckBox_Checked"
+                                                  Unchecked="TodoCheckBox_Checked" />
+
+                                        <TextBox Grid.Column="1" 
+                                                 Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                 TextWrapping="Wrap"
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 FontSize="13.5"
+                                                 FontFamily="Segoe UI"
+                                                 Foreground="#374151"
+                                                 VerticalAlignment="Center"
+                                                 TextChanged="TodoTextBox_TextChanged">
+                                            <TextBox.Style>
+                                                <Style TargetType="TextBox">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                            <Setter Property="TextDecorations" Value="Strikethrough" />
+                                                            <Setter Property="Foreground" Value="#9CA3AF" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+                                        </TextBox>
+                                        
+                                        <!-- Delete Item Button -->
+                                        <Button Grid.Column="2"
+                                                Click="BtnDeleteTodo_Click"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Foreground="#9CA3AF"
+                                                Cursor="Hand"
+                                                ToolTip="Delete Item"
+                                                Content="✕"
+                                                FontSize="10"
+                                                VerticalAlignment="Center"
+                                                Margin="4,0,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Add new item row -->
+                        <Button x:Name="BtnAddTodo" 
+                                Click="BtnAddTodo_Click"
+                                HorizontalAlignment="Left"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Foreground="#6B7280"
+                                FontSize="13.5"
+                                FontFamily="Segoe UI"
+                                Margin="22,6,0,0"
+                                Cursor="Hand">
+                            <TextBlock Text="+ List item" FontStyle="Italic"/>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
 
             <!-- ══════════════════════════════════════════════════════
                  ROW 2 — Topic bar  (label / edit overlay)
@@ -143,7 +257,7 @@
                     Padding="10,5">
                 <TextBlock x:Name="TopicLabel"
                            FontFamily="Segoe UI"
-                           FontSize="11"
+                           FontSize="13"
                            FontStyle="Italic"
                            Foreground="#6B7280"
                            Text="Double-click to set topic…"
@@ -161,7 +275,7 @@
                     Visibility="Collapsed">
                 <TextBox x:Name="TopicTextBox"
                          FontFamily="Segoe UI"
-                         FontSize="11"
+                         FontSize="13"
                          FontStyle="Italic"
                          Foreground="#374151"
                          Background="Transparent"
