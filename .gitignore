@@ -73,3 +73,6 @@ coverage*/
 # ── Runtime / user data ───────────────────────
 # Don't commit the user's own saved notes
 notes.json
+installer.iss
+/Output/*
+.env

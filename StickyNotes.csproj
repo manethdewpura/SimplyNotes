@@ -10,6 +10,7 @@
     <RootNamespace>StickyNotes</RootNamespace>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
     <!-- Trim unused code in publish -->
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
